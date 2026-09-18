@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Riya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#070b19',
+                        charcoal: '#1a1c23',
+                        warmAmber: '#d4af37',
+                        rosePink: '#e5a5a5',
+                        sunriseOrange: '#ff8c42',
+                        nightBlue: '#0c1424'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        mono: ['"Space Mono"', 'monospace'],
+                    },
+                    transitionTimingFunction: {
+                        'cinematic': 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --scroll-progress: 0;
+        }
+
+        body {
+            background-color: #070b19;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Playfair Display', serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Film Grain Effect */
+        .film-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Ambient Sound Button */
+        .audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(12, 20, 36, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            color: #d4af37;
+        }
+
+        .audio-toggle:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Scene Container */
+        .scene {
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.5s var(--cinematic), transform 1.5s var(--cinematic);
+        }
+
+        .scene.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography Styles */
+        .cinematic-text {
+            text-align: center;
+            max-width: 800px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        
+        .label-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(229, 165, 165, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .moon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fffde7, #ffd54f 60%, transparent 70%);
+            box-shadow: 0 0 60px rgba(255, 213, 79, 0.4), 0 0 120px rgba(255, 213, 79, 0.2);
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+            opacity: 0.8;
+            animation: moonFloat 10s ease-in-out infinite alternate;
+        }
+
+        .cloud {
+            position: absolute;
+            background: radial-gradient(closest-side, rgba(255,255,255,0.05), transparent);
+            border-radius: 50%;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
+        @keyframes moonFloat {
+            0% { transform: translate(-50%, 0); }
+            100% { transform: translate(-50%, 15px); }
+        }
+
+        #scene2 {
+            background: linear-gradient(to bottom, #070b19, #1a1c23);
+        }
+        
+        .rain-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .drop {
+            position: absolute;
+            bottom: 100%;
+            width: 1px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.4));
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+
+        .window-glow {
+            position: absolute;
+            width: 60vw;
+            height: 60vh;
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        #scene3 {
+            background: linear-gradient(to bottom, #0c1424 0%, #2a1625 50%, #4a1f1b 100%);
+            transition: background 2s ease;
+        }
+
+        .sun {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,140,66,0.8) 0%, rgba(229,165,165,0.4) 40%, transparent 70%);
+            border-radius: 50%;
+            z-index: -2;
+            opacity: 0;
+            transition: opacity 2s ease, transform 3s ease-out;
+        }
+
+        #scene3.visible .sun {
+            opacity: 1;
+            transform: translate(-50%, -100px);
+        }
+
+        .mountains {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40vh;
+            background: 
+                polygon(0% 100%, 0% 60%, 15% 40%, 30% 70%, 45% 30%, 60% 80%, 75% 45%, 100% 65%, 100% 100%);
+            background-color: #1a1016;
+            clip-path: polygon(0% 100%, 0% 60%, 15% 40%, 30% 70%, 45% 30%, 60% 80%, 75% 45%, 100% 65%, 100% 100%);
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        #scene4 {
+            background-color: #070b19;
+        }
+
+        .starry-sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 4px rgba(255,255,255,0.8); }
+        }
+
+        .magic-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            animation: floatUp 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) scale(1.5) rotate(360deg); opacity: 0; }
+        }
+
+        /* Interactive Buttons */
+        .btn-elegant {
+            background: transparent;
+            border: 1px solid rgba(229, 165, 165, 0.4);
+            color: #e5a5a5;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+
+        .btn-elegant::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(229, 165, 165, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
+        }
+
+        .btn-elegant:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-elegant:hover {
+            border-color: rgba(229, 165, 165, 0.8);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(229, 165, 165, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(229,165,165,0.1));
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            color: #d4af37;
+        }
+        
+        .btn-primary:hover {
+            border-color: #d4af37;
+            color: #fff;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.6;
+            transition: opacity 0.5s ease;
+            z-index: 40;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .mouse {
+            width: 24px;
+            height: 36px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 2px;
+            height: 6px;
+            background: white;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scroll 1.5s infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, 12px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="film-grain"></div>
+
+    <!-- Hidden audio element for ambient sound (using a placeholder silent/ambient data uri for structural completeness, in reality you'd link an mp3) -->
+    <audio id="ambient-audio" loop>
+        <!-- A very gentle, royalty-free ambient placeholder URL could go here. For now, relying on structure. -->
+        <source src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
+    </audio>
+
+    <button id="audio-toggle-btn" class="audio-toggle" aria-label="Toggle ambient sound" onclick="toggleAudio()">
+        <i class="fas fa-volume-mute" id="audio-icon"></i>
+    </button>
+
+    <div class="scroll-indicator" id="scroll-prompt">
+        <span class="text-[10px] font-mono tracking-widest uppercase mb-2 text-gray-400">Scroll</span>
+        <div class="mouse"><div class="wheel"></div></div>
+    </div>
+
+    <section class="scene" id="scene1">
+        <div class="moon"></div>
+        <div class="cloud" style="width: 300px; height: 100px; top: 25%; left: 30%;"></div>
+        <div class="cloud" style="width: 400px; height: 120px; top: 15%; right: 20%;"></div>
+        
+        <div class="text-center z-10 px-4">
+            <p class="label-text">01 // The Realization</p>
+            <h1 class="cinematic-text text-3xl md:text-5xl lg:text-6xl font-normal text-gray-100 italic">
+                “There are things I should have said sooner, Riya.”
+            </h1>
+        </div>
+    </section>
+
+    <section class="scene" id="scene2">
+        <div class="rain-container" id="rain-box"></div>
+        <div class="window-glow"></div>
+        
+        <div class="text-center z-10 px-4 md:px-12 max-w-4xl mx-auto">
+            <p class="label-text">02 // The Apology</p>
+            <p class="cinematic-text text-xl md:text-3xl text-gray-200 font-light">
+                “I was wrong. I hurt you—not because you deserved it, but because I was careless with someone precious.<br><br>
+                <span class="text-rosePink font-medium italic">You are not a feeling I ever want to make small, Riya.</span><br>
+                I see that now, clearly.”
+            </p>
+        </div>
+    </section>
+
+    <section class="scene" id="scene3">
+        <div class="sun"></div>
+        <div class="mountains"></div>
+        
+        <div class="text-center z-10 px-4 md:px-12 max-w-4xl mx-auto mt-[-10vh]">
+            <p class="label-text text-sunriseOrange">03 // The Weight</p>
+            <p class="cinematic-text text-lg md:text-2xl text-gray-100 leading-relaxed font-light">
+                “I’m sorry for the weight I gave you to carry. For the moments you felt unheard. For my silence when you needed reassurance. For every time my actions made you question where you stood with me.<br><br>
+                <span class="text-warmAmber italic">You deserve the soft, certain kind of love that makes you feel safe.</span>”
+            </p>
+        </div>
+    </section>
+
+    <section class="scene" id="scene4">
+        <div class="starry-sky" id="stars-box"></div>
+        
+        <div class="text-center z-10 px-4 md:px-12 max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[80vh]">
+            <p class="label-text text-gray-400">04 // The Promise</p>
+            <p class="cinematic-text text-lg md:text-2xl text-gray-200 font-light mb-12">
+                “I don’t expect forgiveness to arrive on cue. But I am choosing to become someone whose care can be felt, not just promised. I’ll give you the space you need—and show you, patiently, that I mean this.<br><br>
+                And when you are ready, I hope I can make you smile again—because your smile has always been <span class="text-rosePink italic">a little unfairly beautiful.</span>”
+            </p>
+            
+            <p class="cinematic-text text-xl md:text-3xl text-gray-400 italic mb-16">
+                “Still completely charmed by you, <br>
+                <span class="text-gray-200">— yours</span>”
+            </p>
+            
+            <!-- Interactive Buttons -->
+            <div class="flex flex-col sm:flex-row gap-6 mt-8 z-20">
+                <button onclick="scrollToTop()" class="btn-elegant">
+                    <i class="fas fa-arrow-up mr-2"></i> Read it again
+                </button>
+                <button onclick="triggerMagic(event)" class="btn-elegant btn-primary">
+                    <i class="fas fa-sparkles mr-2"></i> A little magic for Riya
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer for triggering scene animations on scroll
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.4
+        };
+
+        const sceneObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Hide scroll prompt if past first scene
+                    if(entry.target.id !== 'scene1') {
+                        document.getElementById('scroll-prompt').classList.add('hidden');
+                    } else {
+                        document.getElementById('scroll-prompt').classList.remove('hidden');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scene').forEach(scene => {
+            sceneObserver.observe(scene);
+        });
+
+        // Initialize animations on load
+        window.addEventListener('DOMContentLoaded', () => {
+            createRain();
+            createStars();
+            // Force first scene to show immediately
+            setTimeout(() => {
+                document.getElementById('scene1').classList.add('visible');
+            }, 100);
+        });
+
+        function createRain() {
+            const container = document.getElementById('rain-box');
+            const dropCount = window.innerWidth < 768 ? 40 : 100;
+            
+            for (let i = 0; i < dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('drop');
+                
+                // Randomize position, duration, and delay
+                const left = Math.random() * 100;
+                const duration = Math.random() * 1 + 0.5; // 0.5 to 1.5s
+                const delay = Math.random() * 2;
+                
+                drop.style.left = `${left}%`;
+                drop.style.animationDuration = `${duration}s`;
+                drop.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(drop);
+            }
+        }
+
+        function createStars() {
+            const container = document.getElementById('stars-box');
+            const starCount = window.innerWidth < 768 ? 50 : 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1; // 1px to 4px
+                const top = Math.random() * 100;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 3 + 2; // 2s to 5s
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${top}%`;
+                star.style.left = `${left}%`;
+                star.style.setProperty('--duration', `${duration}s`);
+                
+                container.appendChild(star);
+            }
+        }
+
+        let audioPlaying = false;
+        const audio = document.getElementById('ambient-audio');
+        const audioIcon = document.getElementById('audio-icon');
+        
+        // Optional: Using Web Audio API to synthesize a very soft drone if external mp3 fails
+        let audioCtx;
+        let oscillator;
+        let gainNode;
+
+        function initSynth() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+                
+                // Soft, warm pad sound parameters
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 220; // A3
+                
+                gainNode.gain.value = 0; // Start silent
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+            } catch(e) {
+                console.log("Web Audio API not supported");
+            }
+        }
+
+        function toggleAudio() {
+            audioPlaying = !audioPlaying;
+            
+            if (audioPlaying) {
+                audioIcon.classList.remove('fa-volume-mute');
+                audioIcon.classList.add('fa-volume-up');
+                
+                // Try HTML5 audio first (fallback if source is present)
+                audio.play().catch(e => {
+                    // Fallback to synth if mp3 source is invalid/blocked
+                    if(!audioCtx) initSynth();
+                    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                    if(gainNode) gainNode.gain.setTargetAtTime(0.05, audioCtx.currentTime, 2);
+                });
+            } else {
+                audioIcon.classList.remove('fa-volume-up');
+                audioIcon.classList.add('fa-volume-mute');
+                audio.pause();
+                if(gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function triggerMagic(event) {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+            
+            const particleCount = 40;
+            const colors = ['#e5a5a5', '#d4af37', '#ff8c42', '#ffffff'];
+            const icons = ['fa-heart', 'fa-star', 'fa-sparkles'];
+
+            for (let i = 0; i < particleCount; i++) {
+                createParticle(startX, startY, colors, icons);
+            }
+            
+            // Add a temporary glow to the button
+            button.style.boxShadow = '0 0 40px rgba(229, 165, 165, 0.8)';
+            setTimeout(() => {
+                button.style.boxShadow = '';
+            }, 1000);
+        }
+
+        function createParticle(x, y, colors, icons) {
+            const particle = document.createElement('i');
+            
+            // Randomly select icon and color
+            const iconClass = icons[Math.floor(Math.random() * icons.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.className = `fas ${iconClass} magic-particle`;
+            particle.style.color = color;
+            
+            // Randomize size and initial spread
+            const size = Math.random() * 15 + 10;
+            const offsetX = (Math.random() - 0.5) * 100; // Spread out horizontally
+            
+            particle.style.fontSize = `${size}px`;
+            particle.style.left = `${x + offsetX}px`;
+            particle.style.top = `${y}px`;
+            
+            // Randomize animation duration slightly
+            const duration = Math.random() * 2 + 2;
+            particle.style.animationDuration = `${duration}s`;
+            
+            document.body.appendChild(particle);
+            
+            // Cleanup
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }
+        
+        // Handle window resize to adjust responsive canvases (rain/stars)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                document.getElementById('rain-box').innerHTML = '';
+                document.getElementById('stars-box').innerHTML = '';
+                createRain();
+                createStars();
+            }, 250);
+        });
+    </script>
+</body>
+</html>
